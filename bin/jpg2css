@@ -1,0 +1,35 @@
+#!/usr/bin/env ruby
+require "fileutils"
+
+class ImgToCss
+  def initialize(*args)
+    @input = args[0]
+  end
+
+  def dimensions(input)
+    `identify #{input} | awk '{print $3}'`.strip.split('x').map(&:to_i)
+  end
+
+  def color(input, x, y)
+    `convert #{input} -crop '1x1+#{x}+#{y}' txt:- | grep '^0,0' | awk '{print $3}'`.strip
+  end
+
+  def run
+    width, height = dimensions @input
+
+    shadow = []
+    (0..width-1).each do |x|
+      (0..height-1).each do |y|
+        next if x == y && x == 0
+        puts "#{x}, #{y}"
+        shadow << "#{x}px #{y}px 0px #{color(@input, x, y)}"
+      end
+    end
+
+    first_pixel = color(@input, 0, 0)
+    output = "<div style='display:block;width:1px;height:1px;background:#{first_pixel};box-shadow:#{shadow.join(",")}'></div>"
+    File.write("./output.html", output)
+
+  end
+end
+ImgToCss.new(*ARGV).run
