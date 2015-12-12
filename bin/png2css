@@ -14,13 +14,13 @@ class PngToCss
     puts 'Generating box-shadow'
     shadow = []
     matrix.each_line do |line|
-      coords, rgba, hexa = line.split(' ')
+      coords, _, hexa = line.split(' ')
       x, y = coords.tr(':', '').split(',')
       next if hexa.length == 9
       shadow << "#{x}px #{y}px 0px #{hexa}"
     end
 
-    output = "<body style='background:#AC1A2F'><div style='display:block;width:1px;transform:scale(0.25,0.25);height:1px;background:transparent;box-shadow:#{shadow.join(",")}'></div></body>"
+    output = "<div style='display:block;width:1px;height:1px;background:transparent;box-shadow:#{shadow.join(",")}'></div>"
     File.write('./output.html', output)
   end
 end

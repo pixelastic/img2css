@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
-require "fileutils"
+require 'fileutils'
 
-class ImgToCss
+class JpgToCss
   def initialize(*args)
     @input = args[0]
   end
@@ -22,4 +22,4 @@ class ImgToCss
     File.write('./output.html', output)
   end
 end
-ImgToCss.new(*ARGV).run
+JpgToCss.new(*ARGV).run
