@@ -1,0 +1,37 @@
+#!/usr/bin/env ruby
+require 'fileutils'
+
+# Transform any image into a CSS image drawn with box-shadow
+class Img2Css
+  def initialize(*args)
+    @input = args[0]
+  end
+
+  def run
+    matrix = `convert #{@input} txt:- | tail -n +2`.strip
+
+    shadow = []
+    matrix.each_line do |line|
+      coords, _, hexa, rgba = line.split(' ')
+      next if rgba == 'none'
+      x, y = coords.tr(':', '').split(',')
+      hexa = hexa[0..6]
+      shadow << "#{x}px #{y}px 0px #{hexa}"
+    end
+
+    classname = File.basename(@input, File.extname(@input))
+    shadow = shadow.join(",\n  ")
+    output = [
+      ".#{classname} {",
+      '  display: block;',
+      '  width: 1px;',
+      '  height: 1px;',
+      '  background: transparent;',
+      "  box-shadow: #{shadow};",
+      '}'
+    ]
+
+    puts output.join("\n")
+  end
+end
+Img2Css.new(*ARGV).run
